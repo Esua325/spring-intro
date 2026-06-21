@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptech Student Portal</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
+
+        .navbar {
+            background: #0f3460;
+            color: white;
+            padding: 14px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 { font-size: 20px; }
+        .navbar .user-info { font-size: 14px; display: flex; align-items: center; gap: 16px; }
+        .navbar form button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .navbar form button:hover { background: rgba(255,255,255,0.25); }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f3460;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 28px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .btn-primary { background: #0f3460; color: white; }
+        .btn-primary:hover { background: #1a4a8a; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #0f3460;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8f9fa; }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-A { background: #eafaf1; color: #1e8449; }
+        .badge-B { background: #eaf4fb; color: #1a5276; }
+        .badge-C { background: #fef9e7; color: #7d6608; }
+        .badge-D { background: #fdf2e9; color: #784212; }
+        .badge-F { background: #fdedec; color: #922b21; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+            font-size: 15px;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .course-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fafafa;
+        }
+        .course-card .course-code {
+            font-size: 11px;
+            font-weight: 700;
+            color: #0f3460;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .course-card .course-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 6px 0 4px;
+        }
+        .course-card .course-desc {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.5;
+        }
+        .course-card .course-duration {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #555;
+        }
+        .no-courses {
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 6px;
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .actions { display: flex; gap: 8px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>🎓 Aptech Student Portal</h1>
+    <div class="user-info">
+        <span>Welcome, <strong sec:authentication="name"></strong></span>
+        <form method="post" th:action="@{/logout}">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Students Section -->
+    <div class="card">
+        <div class="top-bar">
+            <div class="section-title">📋 Students</div>
+            <a th:href="@{/students/add}" class="btn btn-primary"
+               sec:authorize="hasAnyRole('ADMIN', 'STUDENT')">+ Add Student</a>
+        </div>
+
+        <div th:if="${students.isEmpty()}" class="empty-state">
+            No students registered yet. Click "Add Student" to get started.
+        </div>
+
+        <table th:if="${!students.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Grade</th>
+                    <th sec:authorize="hasRole('ADMIN')">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="student : ${students}">
+                    <td th:text="${student.id}"></td>
+                    <td th:text="${student.name}"></td>
+                    <td th:text="${student.email}"></td>
+                    <td th:text="${student.course}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="'badge-' + ${student.grade}"
+                              th:text="${student.grade}"></span>
+                    </td>
+                    <td sec:authorize="hasRole('ADMIN')">
+                        <div class="actions">
+                            <a th:href="@{/students/edit/{id}(id=${student.id})}"
+                               class="btn btn-warning">Edit</a>
+                            <a th:href="@{/students/delete/{id}(id=${student.id})}"
+                               class="btn btn-danger"
+                               onclick="return confirm('Delete this student?')">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Available Courses Section (from course-service via OpenFeign) -->
+    <div class="card">
+        <div class="section-title">📚 Available Courses <small style="font-size:12px;color:#888;font-weight:400;">(fetched from Course Service)</small></div>
+
+        <div th:if="${courses.isEmpty()}" class="no-courses">
+            ⚠️ Course Service is unavailable. Courses cannot be loaded right now.
+        </div>
+
+        <div th:if="${!courses.isEmpty()}" class="courses-grid">
+            <div class="course-card" th:each="course : ${courses}">
+                <div class="course-code" th:text="${course.code}"></div>
+                <div class="course-name" th:text="${course.name}"></div>
+                <div class="course-desc" th:text="${course.description}"></div>
+                <div class="course-duration">⏱ <span th:text="${course.duration}"></span> weeks</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

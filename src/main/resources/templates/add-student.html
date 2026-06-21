@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Student — Aptech Portal</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        .navbar {
+            background: #0f3460; color: white;
+            padding: 14px 30px; font-size: 18px; font-weight: 700;
+        }
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .card {
+            background: white; border-radius: 10px;
+            padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h2 { color: #0f3460; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+        input[type="text"], input[type="email"], select {
+            width: 100%; padding: 10px 14px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; transition: border-color 0.2s;
+        }
+        input:focus, select:focus { outline: none; border-color: #0f3460; }
+        .error-message {
+            color: #c0392b; font-size: 12px; margin-top: 4px;
+            display: block; padding: 4px 8px;
+            background: #fdf0ef; border-left: 3px solid #e74c3c; border-radius: 3px;
+        }
+        .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+        .btn {
+            padding: 10px 24px; border-radius: 6px;
+            font-size: 14px; font-weight: 600;
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        .btn-primary { background: #0f3460; color: white; }
+        .btn-secondary { background: #e8e8e8; color: #555; }
+    </style>
+</head>
+<body>
+<nav class="navbar">🎓 Aptech Student Portal</nav>
+<div class="container">
+    <div class="card">
+        <h2>Add New Student</h2>
+
+        <form th:action="@{/students/add}" th:object="${student}" method="post">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" th:field="*{name}" placeholder="Enter full name">
+                <span class="error-message"
+                      th:if="${#fields.hasErrors('name')}"
+                      th:errors="*{name}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" th:field="*{email}" placeholder="Enter email">
+                <span class="error-message"
+                      th:if="${#fields.hasErrors('email')}"
+                      th:errors="*{email}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Course</label>
+                <select th:field="*{course}">
+                    <option value="">-- Select a Course --</option>
+                    <option th:each="c : ${courses}"
+                            th:value="${c.name}"
+                            th:text="${c.name}"></option>
+                    <!-- Fallback options if course-service is down -->
+                    <option th:if="${courses.isEmpty()}" value="Spring MVC">Spring MVC</option>
+                    <option th:if="${courses.isEmpty()}" value="Spring Boot">Spring Boot</option>
+                    <option th:if="${courses.isEmpty()}" value="Microservices">Microservices</option>
+                </select>
+                <span class="error-message"
+                      th:if="${#fields.hasErrors('course')}"
+                      th:errors="*{course}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Grade</label>
+                <select th:field="*{grade}">
+                    <option value="">-- Select Grade --</option>
+                    <option value="A">A — Excellent</option>
+                    <option value="B">B — Good</option>
+                    <option value="C">C — Average</option>
+                    <option value="D">D — Below Average</option>
+                    <option value="F">F — Fail</option>
+                </select>
+                <span class="error-message"
+                      th:if="${#fields.hasErrors('grade')}"
+                      th:errors="*{grade}"></span>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary">Save Student</button>
+                <a th:href="@{/students}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
